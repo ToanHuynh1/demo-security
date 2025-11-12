@@ -1,4 +1,4 @@
-package com.demo_security.demo_security.controller;
+package com.demo_security.demo_security.controller.file;
 
 import com.demo_security.demo_security.model.UploadedFile;
 import com.demo_security.demo_security.service.file.FileService;

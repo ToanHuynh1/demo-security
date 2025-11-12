@@ -26,7 +26,8 @@ public class UserAdminController {
 
 
     @GetMapping
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
+    // @PreAuthorize("hasAuthority('USER_MANAGE')")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get all users", description = "Retrieve all users (admin only)")
     @ApiResponse(responseCode = "200", description = "Users retrieved successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
