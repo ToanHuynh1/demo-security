@@ -124,7 +124,24 @@
 			<version>0.11.5</version>
 			<scope>runtime</scope>
 		</dependency>
+		<!-- AWS S3 for cloud file uploads -->
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.26.8</version>
+		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>jcenter</id>
+			<url>https://jcenter.bintray.com</url>
+		</repository>
+		<repository>
+			<id>maven-central</id>
+			<url>https://repo.maven.apache.org/maven2/</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>
@@ -167,5 +184,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
