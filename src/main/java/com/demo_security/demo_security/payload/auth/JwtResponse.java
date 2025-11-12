@@ -1,4 +1,4 @@
-package com.demo_security.demo_security.payload;
+package com.demo_security.demo_security.payload.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

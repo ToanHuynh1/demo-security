@@ -1,15 +1,15 @@
 package com.demo_security.demo_security.service.auth;
 
+import java.util.EnumSet;
 import com.demo_security.demo_security.model.User;
-import com.demo_security.demo_security.payload.JwtResponse;
-import com.demo_security.demo_security.payload.LoginRequest;
-import com.demo_security.demo_security.payload.RefreshTokenRequest;
-import com.demo_security.demo_security.payload.RegisterRequest;
+import com.demo_security.demo_security.payload.auth.JwtResponse;
+import com.demo_security.demo_security.payload.auth.LoginRequest;
+import com.demo_security.demo_security.payload.auth.RefreshTokenRequest;
+import com.demo_security.demo_security.payload.auth.RegisterRequest;
 import com.demo_security.demo_security.security.JwtUtils;
 import com.demo_security.demo_security.service.user.UserService;
 import com.demo_security.demo_security.model.RoleConstants;
 import com.demo_security.demo_security.model.Permission;
-import java.util.EnumSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

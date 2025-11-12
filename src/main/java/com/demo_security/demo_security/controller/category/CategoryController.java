@@ -6,8 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
+import com.demo_security.demo_security.payload.category.CategoryRequest;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -32,19 +33,24 @@ public class CategoryController {
     }
 
 
+
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping
     @PreAuthorize("hasAuthority('CATEGORY_CREATE')")
-    public ResponseEntity<Category> create(@RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.create(category));
+    public ResponseEntity<Category> create(@RequestBody CategoryRequest request) {
+        return ResponseEntity.ok(categoryService.create(request));
     }
 
 
+
+    @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('CATEGORY_UPDATE')")
-    public ResponseEntity<Category> update(@PathVariable Long id, @RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.update(id, category));
+    public ResponseEntity<Category> update(@PathVariable Long id, @RequestBody CategoryRequest request) {
+        return ResponseEntity.ok(categoryService.update(id, request));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('CATEGORY_DELETE')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 
 import java.util.Set;
@@ -32,6 +33,7 @@ public class UserAdminController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_MANAGE')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
@@ -39,6 +41,7 @@ public class UserAdminController {
         return ResponseEntity.noContent().build();
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_MANAGE')")
     public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user) {
@@ -46,6 +49,7 @@ public class UserAdminController {
         return ResponseEntity.ok(updated);
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/{id}/permissions")
     @PreAuthorize("hasAuthority('USER_MANAGE')")
     public ResponseEntity<User> updatePermissions(@PathVariable Long id, @RequestBody Set<Permission> permissions) {
