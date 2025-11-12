@@ -2,6 +2,7 @@ package com.demo_security.demo_security.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -20,8 +21,15 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+
     @Column(nullable = false)
     private String role;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_permissions", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "permission")
+    private Set<Permission> permissions;
 
     @Column(length = 512)
     private String refreshToken;

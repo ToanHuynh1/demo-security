@@ -1,52 +1,51 @@
-package com.demo_security.demo_security.controller;
+package com.demo_security.demo_security.service.auth;
 
 import com.demo_security.demo_security.model.User;
-import com.demo_security.demo_security.service.UserService;
-import com.demo_security.demo_security.payload.LoginRequest;
-import com.demo_security.demo_security.payload.RegisterRequest;
 import com.demo_security.demo_security.payload.JwtResponse;
+import com.demo_security.demo_security.payload.LoginRequest;
 import com.demo_security.demo_security.payload.RefreshTokenRequest;
+import com.demo_security.demo_security.payload.RegisterRequest;
 import com.demo_security.demo_security.security.JwtUtils;
+import com.demo_security.demo_security.service.user.UserService;
+import com.demo_security.demo_security.model.RoleConstants;
+import com.demo_security.demo_security.model.Permission;
+import java.util.EnumSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 
-@RestController
-@RequestMapping("/api/auth")
-public class AuthController {
+@Service
+public class AuthServiceImpl implements AuthService {
     @Autowired
     private AuthenticationManager authenticationManager;
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private JwtUtils jwtUtils;
 
-
-    @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(
-            loginRequest.getUsername(),
-            loginRequest.getPassword()
-        )
-    );
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    String jwt = jwtUtils.generateJwtToken(authentication);
-    String refreshToken = jwtUtils.generateRefreshToken(loginRequest.getUsername());
-    long refreshExpiry = System.currentTimeMillis() + jwtUtils.getRefreshExpirationMs();
-    userService.updateRefreshToken(loginRequest.getUsername(), refreshToken, refreshExpiry);
-    User user = userService.findByUsername(loginRequest.getUsername()).get();
-    return ResponseEntity.ok(new JwtResponse(jwt, refreshToken, user.getUsername(), user.getRole()));
+    @Override
+    public ResponseEntity<?> login(LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(authentication);
+        String refreshToken = jwtUtils.generateRefreshToken(loginRequest.getUsername());
+        long refreshExpiry = System.currentTimeMillis() + jwtUtils.getRefreshExpirationMs();
+        userService.updateRefreshToken(loginRequest.getUsername(), refreshToken, refreshExpiry);
+        User user = userService.findByUsername(loginRequest.getUsername()).get();
+        return ResponseEntity.ok(new JwtResponse(jwt, refreshToken, user.getUsername(), user.getRole()));
     }
-    @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
+
+    @Override
+    public ResponseEntity<?> refreshToken(RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
         if (!jwtUtils.validateRefreshToken(refreshToken)) {
             return ResponseEntity.badRequest().body("Invalid refresh token");
@@ -66,23 +65,30 @@ public class AuthController {
         return ResponseEntity.ok(new JwtResponse(newAccessToken, newRefreshToken, user.getUsername(), user.getRole()));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest signUpRequest) {
+    @Override
+    public ResponseEntity<?> register(RegisterRequest signUpRequest) {
         if (userService.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body("Error: Username is already taken!");
         }
         String role = signUpRequest.getRole();
-        if (role == null || (!role.equalsIgnoreCase("ADMIN") && !role.equalsIgnoreCase("USER"))) {
-            role = "USER";
+        if (role == null || (!role.equalsIgnoreCase(RoleConstants.ADMIN) && !role.equalsIgnoreCase(RoleConstants.USER))) {
+            role = RoleConstants.USER;
         } else {
             role = role.toUpperCase();
+        }
+        EnumSet<Permission> permissions;
+        if (role.equals(RoleConstants.ADMIN)) {
+            permissions = EnumSet.of(Permission.ADMIN_DASHBOARD_VIEW, Permission.USER_PROFILE_VIEW);
+        } else {
+            permissions = EnumSet.of(Permission.USER_PROFILE_VIEW);
         }
         User user = User.builder()
                 .username(signUpRequest.getUsername())
                 .password(signUpRequest.getPassword())
                 .role(role)
+                .permissions(permissions)
                 .build();
         userService.save(user);
         return ResponseEntity.ok("User registered successfully!");

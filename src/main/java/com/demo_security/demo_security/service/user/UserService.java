@@ -1,11 +1,13 @@
-package com.demo_security.demo_security.service;
+package com.demo_security.demo_security.service.user;
 
+import java.util.List;
+import com.demo_security.demo_security.model.Permission;
+import java.util.Set;
 import com.demo_security.demo_security.model.User;
 import com.demo_security.demo_security.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 @Service
@@ -38,4 +40,36 @@ public class UserService {
             userRepository.save(user);
         }
     }
+
+    public User updatePermissions(Long userId, Set<Permission> permissions) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setPermissions(permissions);
+        return userRepository.save(user);
+    }
+
+        public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    public void delete(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    public User update(Long id, User user) {
+        User existing = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        existing.setUsername(user.getUsername());
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            existing.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        existing.setRole(user.getRole());
+        existing.setPermissions(user.getPermissions());
+        return userRepository.save(existing);
+    }
+
 }
