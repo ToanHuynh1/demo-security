@@ -9,7 +9,6 @@ import com.demo_security.demo_security.payload.course.CourseMapper;
 import com.demo_security.demo_security.repository.CourseRepository;
 import com.demo_security.demo_security.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
