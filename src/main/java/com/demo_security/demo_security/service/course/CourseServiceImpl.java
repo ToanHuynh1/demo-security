@@ -17,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import com.demo_security.demo_security.service.common.GenericSearchService;
 import com.demo_security.demo_security.payload.course.CourseSearchCriteria;
+import org.springframework.data.domain.Sort;
+import com.demo_security.demo_security.model.CourseDto;
+import org.springframework.data.domain.PageRequest;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -28,9 +31,9 @@ public class CourseServiceImpl implements CourseService {
         this.categoryRepository = categoryRepository;
     }
 
-    public Page<Course> searchCourses(CourseSearchCriteria criteria, int page, int size) {
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
-        org.springframework.data.jpa.domain.Specification<Course> spec = org.springframework.data.jpa.domain.Specification.where(null);
+    public Page<CourseDto> searchCourses(CourseSearchCriteria criteria, int page, int size, Sort sort) {
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Specification<Course> spec = Specification.where(null);
         if (criteria.getName() != null && !criteria.getName().isEmpty()) {
             spec = spec.and((root, query, cb) -> cb.like(root.get("name"), "%" + criteria.getName() + "%"));
         }
@@ -38,7 +41,7 @@ public class CourseServiceImpl implements CourseService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("category").get("name"), criteria.getCategory()));
         }
         // Thêm các điều kiện filter khác nếu cần
-            return GenericSearchService.search((JpaSpecificationExecutor<Course>) courseRepository, spec, pageable, c -> c);
+        return GenericSearchService.search((JpaSpecificationExecutor<Course>) courseRepository, spec, pageable, CourseDto::fromEntity);
     }
 
     @Override

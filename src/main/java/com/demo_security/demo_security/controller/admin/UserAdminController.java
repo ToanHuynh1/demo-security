@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import com.demo_security.demo_security.payload.user.UserSearchCriteria;
+import org.springframework.data.domain.Sort;
 
 @RestController
 @RequestMapping("/api/admin/users")
@@ -34,11 +35,14 @@ public class UserAdminController {
     public ResponseEntity<?> getAll(@RequestParam(defaultValue = "0") int page,
                                     @RequestParam(defaultValue = "10") int size,
                                     @RequestParam(required = false) String username,
-                                    @RequestParam(required = false) String role) {
+                                    @RequestParam(required = false) String role,
+                                    @RequestParam(defaultValue = "id,asc") String sort) {
         UserSearchCriteria criteria = new UserSearchCriteria();
         criteria.setUsername(username);
         criteria.setRole(role);
-        return ResponseEntity.ok(userService.searchUsers(criteria, page, size));
+        String[] sortParams = sort.split(",");
+        Sort sortObj = Sort.by(Sort.Direction.fromString(sortParams.length > 1 ? sortParams[1] : "asc"), sortParams[0]);
+        return ResponseEntity.ok(userService.searchUsers(criteria, page, size, sortObj));
     }
 
     @GetMapping("/{id}")

@@ -13,20 +13,21 @@ import org.springframework.data.jpa.domain.Specification;
 import com.demo_security.demo_security.service.common.GenericSearchService;
 import com.demo_security.demo_security.payload.category.CategorySearchCriteria;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    public Page<Category> searchCategories(CategorySearchCriteria criteria, int page, int size) {
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
-        org.springframework.data.jpa.domain.Specification<Category> spec = org.springframework.data.jpa.domain.Specification.where(null);
+    public Page<Category> searchCategories(CategorySearchCriteria criteria, int page, int size, Sort sort) {
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
+        Specification<Category> spec = Specification.where(null);
         if (criteria.getName() != null && !criteria.getName().isEmpty()) {
             spec = spec.and((root, query, cb) -> cb.like(root.get("name"), "%" + criteria.getName() + "%"));
         }
         // Thêm các điều kiện filter khác nếu cần
-    return GenericSearchService.search((org.springframework.data.jpa.repository.JpaSpecificationExecutor<Category>) categoryRepository, spec, pageable, c -> c);
+        return GenericSearchService.search((JpaSpecificationExecutor<Category>) categoryRepository, spec, pageable, c -> c);
     }
 
     @Override

@@ -43,8 +43,8 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public Page<UserDto> searchUsers(UserSearchCriteria criteria, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<UserDto> searchUsers(UserSearchCriteria criteria, int page, int size, org.springframework.data.domain.Sort sort) {
+        Pageable pageable = PageRequest.of(page, size, sort);
         Specification<User> spec = Specification.where(null);
         if (criteria.getUsername() != null && !criteria.getUsername().isEmpty()) {
             spec = spec.and((root, query, cb) -> cb.like(root.get("username"), "%" + criteria.getUsername() + "%"));

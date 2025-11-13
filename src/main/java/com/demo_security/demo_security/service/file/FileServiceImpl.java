@@ -25,6 +25,8 @@ import com.demo_security.demo_security.service.common.GenericSearchService;
 import com.demo_security.demo_security.payload.file.FileSearchCriteria;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.domain.Sort;
  
 @Service
 public class FileServiceImpl implements FileService {
@@ -56,15 +58,14 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    public Page<UploadedFile> searchFiles(FileSearchCriteria criteria, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<UploadedFile> searchFiles(FileSearchCriteria criteria, int page, int size, Sort sort) {
+        Pageable pageable = PageRequest.of(page, size, sort);
         Specification<UploadedFile> spec = Specification.where(null);
         if (criteria.getFilename() != null && !criteria.getFilename().isEmpty()) {
             spec = spec.and((root, query, cb) -> cb.like(root.get("filename"), "%" + criteria.getFilename() + "%"));
         }
         // Thêm các điều kiện filter khác nếu cần
-        return GenericSearchService.search(uploadedFileRepository, spec, pageable, f -> f);
-    return GenericSearchService.search((org.springframework.data.jpa.repository.JpaSpecificationExecutor<UploadedFile>) uploadedFileRepository, spec, pageable, f -> f);
+        return GenericSearchService.search((JpaSpecificationExecutor<UploadedFile>) uploadedFileRepository, spec, pageable, f -> f);
     }
 
     @Override
