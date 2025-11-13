@@ -1,6 +1,6 @@
 package com.demo_security.demo_security.service.course;
 
-
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.demo_security.demo_security.model.Course;
 import com.demo_security.demo_security.model.Category;
 import com.demo_security.demo_security.payload.course.CourseRequest;
@@ -12,6 +12,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import com.demo_security.demo_security.service.common.GenericSearchService;
+import com.demo_security.demo_security.payload.course.CourseSearchCriteria;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -21,6 +26,25 @@ public class CourseServiceImpl implements CourseService {
     public CourseServiceImpl(CourseRepository courseRepository, CategoryRepository categoryRepository) {
         this.courseRepository = courseRepository;
         this.categoryRepository = categoryRepository;
+    }
+
+    public Page<Course> searchCourses(CourseSearchCriteria criteria, int page, int size) {
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.jpa.domain.Specification<Course> spec = org.springframework.data.jpa.domain.Specification.where(null);
+        if (criteria.getName() != null && !criteria.getName().isEmpty()) {
+            spec = spec.and((root, query, cb) -> cb.like(root.get("name"), "%" + criteria.getName() + "%"));
+        }
+        if (criteria.getCategory() != null && !criteria.getCategory().isEmpty()) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("category").get("name"), criteria.getCategory()));
+        }
+        // Thêm các điều kiện filter khác nếu cần
+            return GenericSearchService.search((JpaSpecificationExecutor<Course>) courseRepository, spec, pageable, c -> c);
+    }
+
+    @Override
+    public Page<Course> getCourses(Pageable pageable) {
+        // Nếu cần fetch category, dùng custom query
+        return courseRepository.findAllWithCategory(pageable);
     }
 
     @Override

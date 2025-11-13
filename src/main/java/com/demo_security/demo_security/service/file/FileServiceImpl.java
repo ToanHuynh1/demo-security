@@ -18,7 +18,14 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import com.demo_security.demo_security.service.common.GenericSearchService;
+import com.demo_security.demo_security.payload.file.FileSearchCriteria;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+ 
 @Service
 public class FileServiceImpl implements FileService {
     @Autowired
@@ -47,6 +54,17 @@ public class FileServiceImpl implements FileService {
                     .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
                     .build();
         }
+    }
+
+    public Page<UploadedFile> searchFiles(FileSearchCriteria criteria, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<UploadedFile> spec = Specification.where(null);
+        if (criteria.getFilename() != null && !criteria.getFilename().isEmpty()) {
+            spec = spec.and((root, query, cb) -> cb.like(root.get("filename"), "%" + criteria.getFilename() + "%"));
+        }
+        // Thêm các điều kiện filter khác nếu cần
+        return GenericSearchService.search(uploadedFileRepository, spec, pageable, f -> f);
+    return GenericSearchService.search((org.springframework.data.jpa.repository.JpaSpecificationExecutor<UploadedFile>) uploadedFileRepository, spec, pageable, f -> f);
     }
 
     @Override
@@ -90,6 +108,11 @@ public class FileServiceImpl implements FileService {
     @Override
     public UploadedFile getFile(Long id) {
         return uploadedFileRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Page<UploadedFile> getFiles(Pageable pageable) {
+        return uploadedFileRepository.findAll(pageable);
     }
 
     @Override

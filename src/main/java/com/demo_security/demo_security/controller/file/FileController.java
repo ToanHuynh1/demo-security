@@ -7,7 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Optional;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
 import java.util.List;
+import  org.springframework.data.domain.Pageable;
+import  org.springframework.data.domain.PageRequest;
 
 @RestController
 @Tag(name = "File", description = "File management endpoints")
@@ -23,8 +28,10 @@ public class FileController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UploadedFile>> getAllFiles() {
-        return ResponseEntity.ok(fileService.getAllFiles());
+    public ResponseEntity<?> getFiles(@RequestParam(defaultValue = "0") int page,
+                                      @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(fileService.getFiles(pageable));
     }
 
     @GetMapping("/{id}")

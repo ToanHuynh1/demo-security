@@ -25,7 +25,7 @@ public class CategoryController {
 
 
     @GetMapping
-    @PreAuthorize("hasAuthority('CATEGORY_VIEW')")
+    @PreAuthorize("hasAuthority('CATEGORY_VIEW') or hasRole('ADMIN')")
     @Operation(summary = "Get all categories", description = "Retrieve all categories")
     @ApiResponse(responseCode = "200", description = "Categories retrieved successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -36,7 +36,7 @@ public class CategoryController {
 
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('CATEGORY_VIEW')")
+    @PreAuthorize("hasAuthority('CATEGORY_VIEW') or hasRole('ADMIN')")
     @Operation(summary = "Get category by ID", description = "Retrieve a specific category by its ID")
     @ApiResponse(responseCode = "200", description = "Category retrieved successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -52,7 +52,7 @@ public class CategoryController {
 
     @PostMapping
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAuthority('CATEGORY_CREATE')")
+    @PreAuthorize("hasAuthority('CATEGORY_CREATE') or hasRole('ADMIN')")
     @Operation(summary = "Create new category", description = "Create a new category")
     @ApiResponse(responseCode = "200", description = "Category created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input")
@@ -66,7 +66,7 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAuthority('CATEGORY_UPDATE')")
+    @PreAuthorize("hasAuthority('CATEGORY_UPDATE') or hasRole('ADMIN')")
     @Operation(summary = "Update category", description = "Update an existing category")
     @ApiResponse(responseCode = "200", description = "Category updated successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input")
@@ -79,7 +79,7 @@ public class CategoryController {
 
     @DeleteMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAuthority('CATEGORY_DELETE')")
+    @PreAuthorize("hasAuthority('CATEGORY_DELETE') or hasRole('ADMIN')")
     @Operation(summary = "Delete category", description = "Delete a category")
     @ApiResponse(responseCode = "204", description = "Category deleted successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized")

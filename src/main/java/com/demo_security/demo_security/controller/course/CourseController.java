@@ -34,7 +34,7 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-    @PreAuthorize("hasAuthority('COURSE_CREATE')")
+    @PreAuthorize("hasAuthority('COURSE_CREATE') or hasRole('ADMIN')")
     @PostMapping
     @Operation(summary = "Create new course", description = "Create a new course")
     @ApiResponse(responseCode = "200", description = "Course created successfully")
@@ -45,7 +45,7 @@ public class CourseController {
         return ResponseEntity.ok(courseService.createCourse(request));
     }
 
-    @PreAuthorize("hasAuthority('COURSE_UPDATE')")
+    @PreAuthorize("hasAuthority('COURSE_UPDATE') or hasRole('ADMIN')")
     @PutMapping("/{id}")
     @Operation(summary = "Update course", description = "Update an existing course")
     @ApiResponse(responseCode = "200", description = "Course updated successfully")
@@ -57,7 +57,7 @@ public class CourseController {
         return ResponseEntity.ok(courseService.updateCourse(id, request));
     }
 
-    @PreAuthorize("hasAuthority('COURSE_DELETE')")
+    @PreAuthorize("hasAuthority('COURSE_DELETE') or hasRole('ADMIN')")
     @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete course", description = "Delete a course")
@@ -70,7 +70,7 @@ public class CourseController {
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("hasAuthority('COURSE_VIEW')")
+    @PreAuthorize("hasAuthority('COURSE_VIEW') or hasRole('ADMIN')")
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/{id}")
     @Operation(summary = "Get course by ID", description = "Retrieve a specific course by its ID")
@@ -82,7 +82,7 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getCourseById(id));
     }
 
-    @PreAuthorize("hasAuthority('COURSE_VIEW')")
+    @PreAuthorize("hasAuthority('COURSE_VIEW') or hasRole('ADMIN')")
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping
     @Operation(summary = "Get all courses", description = "Retrieve all courses")

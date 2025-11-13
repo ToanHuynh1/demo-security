@@ -67,17 +67,21 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<?> register(RegisterRequest signUpRequest) {
+        String role = signUpRequest.getRole();
+        if (role == null) {
+            role = RoleConstants.USER;
+        } else if (!role.equalsIgnoreCase(RoleConstants.ADMIN) && !role.equalsIgnoreCase(RoleConstants.USER)) {
+            return ResponseEntity.badRequest().body("Error: Role must be USER or ADMIN!");
+        } else {
+            role = role.toUpperCase();
+        }
+
         if (userService.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body("Error: Username is already taken!");
         }
-        String role = signUpRequest.getRole();
-        if (role == null || (!role.equalsIgnoreCase(RoleConstants.ADMIN) && !role.equalsIgnoreCase(RoleConstants.USER))) {
-            role = RoleConstants.USER;
-        } else {
-            role = role.toUpperCase();
-        }
+      
         EnumSet<Permission> permissions;
         if (role.equals(RoleConstants.ADMIN)) {
             permissions = EnumSet.of(Permission.ADMIN_DASHBOARD_VIEW, Permission.USER_PROFILE_VIEW);

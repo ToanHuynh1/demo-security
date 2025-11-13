@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 @SecurityRequirement(name = "bearerAuth")
 public class AdminController {
     @GetMapping("/dashboard")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')") // ADMIN auto-pass, giữ nguyên
     @Operation(summary = "Get admin dashboard", description = "Access admin dashboard (ADMIN only)")
     @ApiResponse(responseCode = "200", description = "Dashboard accessed successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized")

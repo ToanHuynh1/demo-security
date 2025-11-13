@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
 import java.util.Set;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +15,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import com.demo_security.demo_security.payload.user.UserSearchCriteria;
 
 @RestController
 @RequestMapping("/api/admin/users")
@@ -26,18 +26,23 @@ public class UserAdminController {
 
 
     @GetMapping
-    // @PreAuthorize("hasAuthority('USER_MANAGE')")
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "Get all users", description = "Retrieve all users (admin only)")
+    @Operation(summary = "Get all users", description = "Retrieve all users (admin only, paginated, searchable)")
     @ApiResponse(responseCode = "200", description = "Users retrieved successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions")
-    public List<User> getAll() {
-        return userService.findAll();
+    public ResponseEntity<?> getAll(@RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "10") int size,
+                                    @RequestParam(required = false) String username,
+                                    @RequestParam(required = false) String role) {
+        UserSearchCriteria criteria = new UserSearchCriteria();
+        criteria.setUsername(username);
+        criteria.setRole(role);
+        return ResponseEntity.ok(userService.searchUsers(criteria, page, size));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
+    @PreAuthorize("hasAuthority('USER_MANAGE') or hasRole('ADMIN')")
     @Operation(summary = "Get user by ID", description = "Retrieve a specific user by ID (admin only)")
     @ApiResponse(responseCode = "200", description = "User retrieved successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -51,7 +56,7 @@ public class UserAdminController {
 
     @DeleteMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
+    @PreAuthorize("hasAuthority('USER_MANAGE') or hasRole('ADMIN')")
     @Operation(summary = "Delete user", description = "Delete a user (admin only)")
     @ApiResponse(responseCode = "204", description = "User deleted successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -64,7 +69,7 @@ public class UserAdminController {
 
     @PutMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
+    @PreAuthorize("hasAuthority('USER_MANAGE') or hasRole('ADMIN')")
     @Operation(summary = "Update user", description = "Update user information (admin only)")
     @ApiResponse(responseCode = "200", description = "User updated successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input")
@@ -78,7 +83,7 @@ public class UserAdminController {
 
     @PutMapping("/{id}/permissions")
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
+    @PreAuthorize("hasAuthority('USER_MANAGE') or hasRole('ADMIN')")
     @Operation(summary = "Update user permissions", description = "Update permissions for a user (admin only)")
     @ApiResponse(responseCode = "200", description = "User permissions updated successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input")

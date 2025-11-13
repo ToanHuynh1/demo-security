@@ -5,18 +5,38 @@ import com.demo_security.demo_security.repository.CategoryRepository;
 import com.demo_security.demo_security.payload.category.CategoryRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import com.demo_security.demo_security.service.common.GenericSearchService;
+import com.demo_security.demo_security.payload.category.CategorySearchCriteria;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    public Page<Category> searchCategories(CategorySearchCriteria criteria, int page, int size) {
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.jpa.domain.Specification<Category> spec = org.springframework.data.jpa.domain.Specification.where(null);
+        if (criteria.getName() != null && !criteria.getName().isEmpty()) {
+            spec = spec.and((root, query, cb) -> cb.like(root.get("name"), "%" + criteria.getName() + "%"));
+        }
+        // Thêm các điều kiện filter khác nếu cần
+    return GenericSearchService.search((org.springframework.data.jpa.repository.JpaSpecificationExecutor<Category>) categoryRepository, spec, pageable, c -> c);
+    }
+
     @Override
     public List<Category> findAll() {
         return categoryRepository.findAll();
+    }
+
+    @Override
+    public Page<Category> findAll(Pageable pageable) {
+        return categoryRepository.findAll(pageable);
     }
 
     @Override
