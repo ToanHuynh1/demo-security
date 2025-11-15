@@ -1,10 +1,13 @@
 package com.demo_security.demo_security.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "uploaded_files")
 public class UploadedFile {

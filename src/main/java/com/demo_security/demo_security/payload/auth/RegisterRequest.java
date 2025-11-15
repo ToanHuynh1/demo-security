@@ -1,9 +1,12 @@
 package com.demo_security.demo_security.payload.auth;
 
-import lombok.Data;
+import lombok.*;
 import jakarta.validation.constraints.NotBlank;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class RegisterRequest {
     @NotBlank(message = "Username không được để trống")
     private String username;

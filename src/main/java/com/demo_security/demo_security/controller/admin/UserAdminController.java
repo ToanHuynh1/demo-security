@@ -25,7 +25,6 @@ public class UserAdminController {
     @Autowired
     private UserService userService;
 
-
     @GetMapping
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get all users", description = "Retrieve all users (admin only, paginated, searchable)")
