@@ -9,10 +9,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
-
-
-
 // 3. Listener: Lắng nghe sự kiện
 @Component
 class CustomEventListener {

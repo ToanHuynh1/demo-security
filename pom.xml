@@ -130,6 +130,17 @@
 			<artifactId>s3</artifactId>
 			<version>2.26.8</version>
 		</dependency>
+		<!-- Spring Integration core -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-integration</artifactId>
+		</dependency>
+		<!-- Spring Integration File -->
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-file</artifactId>
+		</dependency>
+		<!-- Spring Integration DSL (for IntegrationFlows) -->
 	</dependencies>
 
 	<repositories>
