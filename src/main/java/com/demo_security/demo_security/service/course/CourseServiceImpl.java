@@ -40,13 +40,11 @@ public class CourseServiceImpl implements CourseService {
         if (criteria.getCategory() != null && !criteria.getCategory().isEmpty()) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("category").get("name"), criteria.getCategory()));
         }
-        // Thêm các điều kiện filter khác nếu cần
         return GenericSearchService.search((JpaSpecificationExecutor<Course>) courseRepository, spec, pageable, CourseDto::fromEntity);
     }
 
     @Override
     public Page<Course> getCourses(Pageable pageable) {
-        // Nếu cần fetch category, dùng custom query
         return courseRepository.findAllWithCategory(pageable);
     }
 

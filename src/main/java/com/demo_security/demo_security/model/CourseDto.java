@@ -14,7 +14,6 @@ public class CourseDto {
     private String name;
     private String description;
     private Category category;
-    // Thêm các trường khác nếu cần
 
     public static CourseDto fromEntity(Course course) {
         return CourseDto.builder()

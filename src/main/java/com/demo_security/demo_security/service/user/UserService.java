@@ -34,6 +34,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import com.demo_security.demo_security.service.common.GenericSearchService;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class UserService {
@@ -43,7 +44,7 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public Page<UserDto> searchUsers(UserSearchCriteria criteria, int page, int size, org.springframework.data.domain.Sort sort) {
+    public Page<UserDto> searchUsers(UserSearchCriteria criteria, int page, int size, Sort sort) {
         Pageable pageable = PageRequest.of(page, size, sort);
         Specification<User> spec = Specification.where(null);
         if (criteria.getUsername() != null && !criteria.getUsername().isEmpty()) {
@@ -52,7 +53,6 @@ public class UserService {
         if (criteria.getRole() != null && !criteria.getRole().isEmpty()) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("role"), criteria.getRole()));
         }
-        // Thêm các điều kiện filter khác nếu cần
         return GenericSearchService.search(userRepository, spec, pageable, UserDto::fromEntity);
     }
 
