@@ -1,12 +1,12 @@
 package com.demo_security.demo_security.service.user;
 
+import com.demo_security.demo_security.mapper.UserMapper;
+import java.util.List;
+import com.demo_security.demo_security.model.Permission;
+import java.util.Set;
+import com.demo_security.demo_security.model.User;
+import com.demo_security.demo_security.repository.UserRepository;
 import com.demo_security.demo_security.payload.user.UserSearchCriteria;
-import com.demo_security.demo_security.model.UserDto;
-import java.util.List;
-import com.demo_security.demo_security.model.Permission;
-import java.util.Set;
-import com.demo_security.demo_security.model.User;
-import com.demo_security.demo_security.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,20 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import com.demo_security.demo_security.model.UserDto;
-import java.util.List;
-import com.demo_security.demo_security.model.Permission;
-import java.util.Set;
-import com.demo_security.demo_security.model.User;
-import com.demo_security.demo_security.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.cache.annotation.Cacheable;
-import java.util.Optional;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import com.demo_security.demo_security.service.common.GenericSearchService;
@@ -44,6 +30,9 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserMapper userMapper;
+
     public Page<UserDto> searchUsers(UserSearchCriteria criteria, int page, int size, Sort sort) {
         Pageable pageable = PageRequest.of(page, size, sort);
         Specification<User> spec = Specification.where(null);
@@ -53,7 +42,7 @@ public class UserService {
         if (criteria.getRole() != null && !criteria.getRole().isEmpty()) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("role"), criteria.getRole()));
         }
-        return GenericSearchService.search(userRepository, spec, pageable, UserDto::fromEntity);
+        return GenericSearchService.search(userRepository, spec, pageable, user -> userMapper.toDto(user));
     }
 
 

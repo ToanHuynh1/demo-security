@@ -15,12 +15,4 @@ public class UserDto {
     private String role;
     private Set<Permission> permissions;
 
-    public static UserDto fromEntity(User user) {
-        return UserDto.builder()
-            .id(user.getId())
-            .username(user.getUsername())
-            .role(user.getRole())
-            .permissions(user.getPermissions())
-            .build();
-    }
 }

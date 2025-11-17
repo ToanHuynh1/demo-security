@@ -6,6 +6,7 @@ import com.demo_security.demo_security.payload.auth.JwtResponse;
 import com.demo_security.demo_security.payload.auth.LoginRequest;
 import com.demo_security.demo_security.payload.auth.RefreshTokenRequest;
 import com.demo_security.demo_security.payload.auth.RegisterRequest;
+import com.demo_security.demo_security.config.CustomMetrics;
 import com.demo_security.demo_security.security.JwtUtils;
 import com.demo_security.demo_security.service.user.UserService;
 import com.demo_security.demo_security.model.RoleConstants;
@@ -26,22 +27,31 @@ public class AuthServiceImpl implements AuthService {
     private UserService userService;
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private CustomMetrics customMetrics;
 
     @Override
     public ResponseEntity<?> login(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
-        String refreshToken = jwtUtils.generateRefreshToken(loginRequest.getUsername());
-        long refreshExpiry = System.currentTimeMillis() + jwtUtils.getRefreshExpirationMs();
-        userService.updateRefreshToken(loginRequest.getUsername(), refreshToken, refreshExpiry);
-        User user = userService.findByUsername(loginRequest.getUsername()).get();
-        return ResponseEntity.ok(new JwtResponse(jwt, refreshToken, user.getUsername(), user.getRole()));
+        customMetrics.incrementLoginAttempts();
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
+            String refreshToken = jwtUtils.generateRefreshToken(loginRequest.getUsername());
+            long refreshExpiry = System.currentTimeMillis() + jwtUtils.getRefreshExpirationMs();
+            userService.updateRefreshToken(loginRequest.getUsername(), refreshToken, refreshExpiry);
+            User user = userService.findByUsername(loginRequest.getUsername()).get();
+            customMetrics.incrementLoginSuccess();
+            return ResponseEntity.ok(new JwtResponse(jwt, refreshToken, user.getUsername(), user.getRole()));
+        } catch (Exception e) {
+            customMetrics.incrementLoginFailures();
+            throw e;
+        }
     }
 
     @Override

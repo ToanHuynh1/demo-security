@@ -1,3 +1,5 @@
+
+
 package com.demo_security.demo_security.model;
 
 import jakarta.persistence.*;
