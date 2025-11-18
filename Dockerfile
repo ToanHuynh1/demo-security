@@ -1,6 +1,6 @@
 
 # Build stage
-FROM eclipse-temurin:17-jdk-jammy as build
+FROM eclipse-temurin:17-jdk-jammy AS build
 WORKDIR /app
 
 COPY mvnw mvnw.cmd pom.xml ./

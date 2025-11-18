@@ -12,6 +12,7 @@ import java.util.Set;
 public class UserDto {
     private Long id;
     private String username;
+    private String email;
     private String role;
     private Set<Permission> permissions;
 

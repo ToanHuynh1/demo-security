@@ -54,6 +54,47 @@ docker-compose up --build
 - Trong production, nên cấu hình `management.endpoints.web.exposure.include` để chỉ expose các endpoint cần thiết
 - Có thể thêm authentication cho các actuator endpoints
 
+## Database Migration với Flyway
+
+Ứng dụng sử dụng Flyway để quản lý database schema migrations. Tất cả migration scripts nằm trong `src/main/resources/db/migration/`.
+
+### Quy tắc đặt tên Migration Scripts:
+
+- `V{version}__{description}.sql` (VD: `V1__Initial_schema.sql`)
+- Version phải là số nguyên hoặc sử dụng format như `1.2.3`
+
+### Migration Scripts hiện có:
+
+- `V1__Initial_schema.sql` - Tạo các bảng cơ bản (users, categories, courses, uploaded_files)
+- `V2__Add_initial_data.sql` - Thêm dữ liệu mẫu
+- `V3__Add_user_email.sql` - Thêm trường email cho users
+
+### Lệnh Flyway hữu ích:
+
+```bash
+# Kiểm tra trạng thái migrations
+./mvnw flyway:info
+
+# Chạy migrations
+./mvnw flyway:migrate
+
+# Tạo baseline (cho database đã có dữ liệu)
+./mvnw flyway:baseline
+
+# Validate migrations
+./mvnw flyway:validate
+
+# Rollback (chỉ với Flyway Teams/Enterprise)
+./mvnw flyway:undo
+```
+
+### Cấu hình Flyway:
+
+- `spring.flyway.enabled=true` - Bật Flyway
+- `spring.flyway.locations=classpath:db/migration` - Vị trí scripts
+- `spring.flyway.baseline-on-migrate=true` - Tạo baseline tự động
+- `spring.flyway.validate-on-migrate=true` - Validate checksums
+
 ```
 Notes:
 

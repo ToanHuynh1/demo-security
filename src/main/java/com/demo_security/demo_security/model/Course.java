@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@Table(name = "courses")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,6 +17,9 @@ public class Course {
     private String name;
     private String description;
     private Double price;
+
+    @Column(nullable = false)
+    private String status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
