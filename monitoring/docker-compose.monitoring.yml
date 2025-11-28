@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: demo-security-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=200h"
+      - "--web.enable-lifecycle"
+    networks:
+      - demo-security-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: demo-security-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana-dashboard.json:/etc/grafana/provisioning/dashboards/demo-dashboard.json
+      - ./monitoring/grafana-datasource.yml:/etc/grafana/provisioning/datasources/prometheus.yml
+    networks:
+      - demo-security-network
+    depends_on:
+      - prometheus
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: demo-security-zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - demo-security-network
+
+volumes:
+  grafana_data:
+
+networks:
+  demo-security-network:
+    driver: bridge

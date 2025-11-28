@@ -11,6 +11,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
     restart: unless-stopped
 
   db:
@@ -25,3 +29,33 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
+
+  redis:
+    image: redis:7.0-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    restart: unless-stopped
+    ports:
+      - "5672:5672" # AMQP port
+      - "15672:15672" # Management UI port
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  redis_data:
+  rabbitmq_data:
